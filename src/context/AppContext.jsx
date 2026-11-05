@@ -1,22 +1,28 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { buildDemoPayload } from '../lib/demoData'
+import { buildDatasetReport } from '../lib/dataset'
 import { createId, loadState, saveState } from '../lib/storage'
 
 const AppContext = createContext(null)
+const EMPTY_DATASETS = []
 
 export function AppProvider({ children }) {
   const [state, setState] = useState(() => loadState())
   const [toast, setToast] = useState(null)
-
-  useEffect(() => {
-    saveState(state)
-  }, [state])
 
   const showToast = useCallback((type, message) => {
     setToast({ type, message, id: Date.now() })
   }, [])
 
   const clearToast = useCallback(() => setToast(null), [])
+
+  useEffect(() => {
+    try {
+      saveState(state)
+    } catch (error) {
+      showToast('error', error.message || 'The dataset could not be stored in this browser.')
+    }
+  }, [state, showToast])
 
   const addFarm = useCallback(
     (farm) => {
@@ -151,9 +157,85 @@ export function AppProvider({ children }) {
   }, [showToast])
 
   const resetAllData = useCallback(() => {
-    setState({ schemaVersion: 1, farms: [], readings: [], recommendations: [] })
-    showToast('success', 'All local demonstration data cleared.')
+    setState((prev) => ({
+      schemaVersion: 1,
+      farms: [],
+      readings: [],
+      recommendations: [],
+      datasets: prev.datasets,
+      activeDatasetId: prev.activeDatasetId,
+    }))
+    showToast('success', 'Farms, readings, and manual recommendations cleared. Uploaded datasets were kept.')
   }, [showToast])
+
+  const saveDataset = useCallback(
+    (draft) => {
+      const record = {
+        id: draft.id ?? createId('dataset'),
+        name: draft.name || draft.fileName || 'Dataset',
+        fileName: draft.fileName || 'dataset.csv',
+        uploadedAt: draft.uploadedAt ?? new Date().toISOString(),
+        source: draft.isSynthetic ? 'synthetic' : 'upload',
+        isSynthetic: Boolean(draft.isSynthetic),
+        headers: draft.headers ?? [],
+        mapping: { ...draft.mapping },
+        rawRows: (draft.rawRows ?? []).map((row) => ({ ...row })),
+        sheetName: draft.sheetName ?? '',
+        headerRow: draft.headerRow ?? 1,
+      }
+      setState((prev) => {
+        const exists = prev.datasets.some((dataset) => dataset.id === record.id)
+        const datasets = exists
+          ? prev.datasets.map((dataset) => (dataset.id === record.id ? record : dataset))
+          : [record, ...prev.datasets]
+        return { ...prev, datasets, activeDatasetId: record.id }
+      })
+      showToast(
+        'success',
+        record.isSynthetic
+          ? 'Synthetic test dataset is now active. It is not real farm data.'
+          : 'Dataset analyzed and set as the active file.',
+      )
+      return record
+    },
+    [showToast],
+  )
+
+  const setActiveDataset = useCallback(
+    (id) => {
+      setState((prev) => ({ ...prev, activeDatasetId: id }))
+      showToast('success', 'Active dataset updated. Dashboard and reports now use this file.')
+    },
+    [showToast],
+  )
+
+  const deleteDataset = useCallback(
+    (id) => {
+      setState((prev) => {
+        const datasets = prev.datasets.filter((dataset) => dataset.id !== id)
+        const activeDatasetId = prev.activeDatasetId === id ? (datasets[0]?.id ?? null) : prev.activeDatasetId
+        return { ...prev, datasets, activeDatasetId }
+      })
+      showToast('success', 'Dataset deleted.')
+    },
+    [showToast],
+  )
+
+  const clearDatasets = useCallback(() => {
+    setState((prev) => ({ ...prev, datasets: [], activeDatasetId: null }))
+    showToast('success', 'Uploaded datasets cleared. Manual farms and readings were kept.')
+  }, [showToast])
+
+  const datasets = Array.isArray(state.datasets) ? state.datasets : EMPTY_DATASETS
+  const activeDataset = datasets.find((dataset) => dataset.id === state.activeDatasetId) ?? null
+  const datasetReport = useMemo(() => {
+    if (!activeDataset) return null
+    try {
+      return buildDatasetReport(activeDataset)
+    } catch {
+      return null
+    }
+  }, [activeDataset])
 
   const value = useMemo(
     () => ({
@@ -172,11 +254,21 @@ export function AppProvider({ children }) {
       deleteRecommendation,
       loadDemoData,
       resetAllData,
+      datasets,
+      activeDataset,
+      datasetReport,
+      saveDataset,
+      setActiveDataset,
+      deleteDataset,
+      clearDatasets,
     }),
     [
       state.farms,
       state.readings,
       state.recommendations,
+      datasets,
+      activeDataset,
+      datasetReport,
       toast,
       showToast,
       clearToast,
@@ -189,6 +281,10 @@ export function AppProvider({ children }) {
       deleteRecommendation,
       loadDemoData,
       resetAllData,
+      saveDataset,
+      setActiveDataset,
+      deleteDataset,
+      clearDatasets,
     ],
   )
 

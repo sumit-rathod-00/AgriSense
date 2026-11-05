@@ -7,7 +7,11 @@ import Toast from './Toast'
 const TITLES = {
   '/': {
     title: 'Dashboard',
-    subtitle: 'Overview of farms, readings, and irrigation recommendations',
+    subtitle: 'Overview of the active dataset, or manual records when no file is loaded',
+  },
+  '/analysis': {
+    title: 'Data Analysis',
+    subtitle: 'Upload a dataset, validate it, and download a report',
   },
   '/farms': {
     title: 'Farm Management',
@@ -23,7 +27,7 @@ const TITLES = {
   },
   '/reports': {
     title: 'Reports',
-    subtitle: 'Summarize demonstration data and export CSV',
+    subtitle: 'Download a PDF report from the active dataset, or export manual records',
   },
   '/about': {
     title: 'About the System',

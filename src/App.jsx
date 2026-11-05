@@ -5,6 +5,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import Layout from './components/Layout'
 
 const Dashboard = lazy(() => import('./pages/Dashboard'))
+const DataAnalysis = lazy(() => import('./pages/DataAnalysis'))
 const FarmManagement = lazy(() => import('./pages/FarmManagement'))
 const CropMonitoring = lazy(() => import('./pages/CropMonitoring'))
 const Recommendations = lazy(() => import('./pages/Recommendations'))
@@ -28,6 +29,7 @@ export default function App() {
             <Routes>
               <Route element={<Layout />}>
                 <Route path="/" element={<Dashboard />} />
+                <Route path="/analysis" element={<DataAnalysis />} />
                 <Route path="/farms" element={<FarmManagement />} />
                 <Route path="/monitoring" element={<CropMonitoring />} />
                 <Route path="/recommendations" element={<Recommendations />} />

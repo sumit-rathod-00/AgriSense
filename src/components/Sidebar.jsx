@@ -7,11 +7,13 @@ import {
   LayoutDashboard,
   Leaf,
   Sparkles,
+  Upload,
   X,
 } from 'lucide-react'
 
 const LINKS = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/analysis', label: 'Data Analysis', icon: Upload },
   { to: '/farms', label: 'Farm Management', icon: Building2 },
   { to: '/monitoring', label: 'Crop Monitoring', icon: Leaf },
   { to: '/recommendations', label: 'Smart Recommendations', icon: Sparkles },
@@ -80,7 +82,7 @@ export default function Sidebar({ open, onClose }) {
         <div className="m-3 rounded-2xl bg-emerald-50 p-4 text-xs text-emerald-900">
           <p className="font-semibold">University demo</p>
           <p className="mt-1 leading-relaxed">
-            Browser-only storage. Irrigation suggestions use published demonstration thresholds, not a trained model.
+            Upload a CSV under Data Analysis for calculated statistics and a PDF report. Irrigation rules use illustrative thresholds, not a trained model.
           </p>
         </div>
       </aside>

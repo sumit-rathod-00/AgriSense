@@ -1,11 +1,14 @@
 import { useMemo, useState } from 'react'
 import { Download, FileText } from 'lucide-react'
+import { StatsTable } from '../components/AnalysisCharts'
 import EmptyState from '../components/EmptyState'
 import { useApp } from '../context/AppContext'
 import { downloadCsv, toCsv } from '../lib/csv'
+import { downloadProcessedCsv, downloadRecommendationsCsv } from '../lib/dataset'
+import { downloadAnalysisReport } from '../lib/reportPdf'
 
 export default function Reports() {
-  const { farms, readings, recommendations, loadDemoData, showToast } = useApp()
+  const { farms, readings, recommendations, loadDemoData, showToast, activeDataset, datasetReport } = useApp()
   const [busy, setBusy] = useState(false)
 
   const cropCounts = useMemo(() => {
@@ -83,10 +86,82 @@ export default function Reports() {
     showToast('success', 'Recommendation CSV downloaded.')
   }
 
+  function generatePdf() {
+    if (!activeDataset || !datasetReport) {
+      showToast('error', 'Analyze a dataset on Data Analysis before generating a PDF.')
+      return
+    }
+    try {
+      downloadAnalysisReport(activeDataset, datasetReport)
+      showToast('success', 'PDF report download started.')
+    } catch (error) {
+      showToast('error', error.message || 'The PDF could not be created.')
+    }
+  }
+
   return (
     <div className="space-y-6">
+      <section className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold text-slate-900">Dataset report</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              The PDF, processed CSV, and recommendation CSV use the active analyzed dataset only.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={generatePdf}
+            disabled={!datasetReport}
+            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+          >
+            <Download className="h-4 w-4" />
+            Generate Report
+          </button>
+        </div>
+        {!activeDataset || !datasetReport ? (
+          <p className="mt-4 text-sm text-slate-500">
+            No dataset is active. Upload a CSV or Excel file on Data Analysis, then return here to download the report.
+          </p>
+        ) : (
+          <div className="mt-4 space-y-4">
+            {activeDataset.isSynthetic ? (
+              <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm font-medium text-amber-950">
+                SYNTHETIC TEST DATA. {activeDataset.fileName} is not a real agricultural survey.
+              </p>
+            ) : (
+              <p className="rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
+                Active file: {activeDataset.fileName}. {datasetReport.validation.valid} valid rows of{' '}
+                {datasetReport.validation.total}.
+              </p>
+            )}
+            <StatsTable analysis={datasetReport.analysis} />
+            <p className="text-sm leading-relaxed text-slate-700">{datasetReport.conclusion}</p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={datasetReport.records.length === 0}
+                onClick={() => downloadProcessedCsv(activeDataset, datasetReport)}
+                className="rounded-xl border border-emerald-200 px-3 py-2 text-sm font-medium text-emerald-800 disabled:opacity-50"
+              >
+                Download processed dataset CSV
+              </button>
+              <button
+                type="button"
+                disabled={datasetReport.recommendations.length === 0}
+                onClick={() => downloadRecommendationsCsv(activeDataset, datasetReport)}
+                className="rounded-xl border border-emerald-200 px-3 py-2 text-sm font-medium text-emerald-800 disabled:opacity-50"
+              >
+                Download recommendations CSV
+              </button>
+            </div>
+          </div>
+        )}
+      </section>
+
       <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-        All report figures are demonstration data stored in localStorage. Exported files include this labelling.
+        The section below summarises manual crop-monitoring records, including any demonstration sample you loaded. It
+        is separate from an uploaded dataset.
       </div>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -155,7 +230,7 @@ export default function Reports() {
                   className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
                 >
                   <Download className="h-4 w-4" />
-                  Download readings CSV
+                  Download manual readings CSV
                 </button>
                 <button
                   type="button"

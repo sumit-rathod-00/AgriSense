@@ -2,11 +2,16 @@ import { Menu, RotateCcw, Sparkles } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 
 export default function TopBar({ title, subtitle, onMenu }) {
-  const { loadDemoData, resetAllData } = useApp()
+  const { loadDemoData, resetAllData, activeDataset } = useApp()
+  const badge = activeDataset?.isSynthetic
+    ? 'Synthetic test data'
+    : activeDataset
+      ? 'Uploaded dataset'
+      : 'Manual records'
 
   function handleReset() {
     const confirmed = window.confirm(
-      'Clear all farms, readings, and recommendations stored in this browser?',
+      'Clear farms, manual readings, and manual recommendations stored in this browser? Uploaded datasets stay until you delete them on Data Analysis.',
     )
     if (confirmed) resetAllData()
   }
@@ -29,8 +34,16 @@ export default function TopBar({ title, subtitle, onMenu }) {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">
-            Demo mode
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              activeDataset?.isSynthetic
+                ? 'bg-amber-100 text-amber-900'
+                : activeDataset
+                  ? 'bg-emerald-50 text-emerald-800'
+                  : 'bg-amber-50 text-amber-800'
+            }`}
+          >
+            {badge}
           </span>
           <button
             type="button"

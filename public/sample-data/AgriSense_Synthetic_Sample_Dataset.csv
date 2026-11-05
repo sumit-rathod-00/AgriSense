@@ -1,0 +1,13 @@
+﻿farm_id,farm_name,location,crop,date,soil_moisture,soil_ph,soil_temperature,humidity,rainfall
+F001,Green Valley Farm,"Aurangabad, Maharashtra",Tomato,2026-10-20,28,6.4,27,65,2.5
+F001,Green Valley Farm,"Aurangabad, Maharashtra",Tomato,2026-10-21,35,6.5,28,62,0.0
+F001,Green Valley Farm,"Aurangabad, Maharashtra",Tomato,2026-10-22,42,6.3,29,60,0.0
+F002,Sunrise Farm,"Jalna, Maharashtra",Wheat,2026-10-20,18,6.1,34,55,1.2
+F002,Sunrise Farm,"Jalna, Maharashtra",Wheat,2026-10-21,31,6.2,30,58,0.0
+F002,Sunrise Farm,"Jalna, Maharashtra",Wheat,2026-10-22,46,6.4,28,61,0.0
+F003,Riverbend Farm,"Pune, Maharashtra",Rice,2026-10-20,74,6.8,26,80,8.5
+F003,Riverbend Farm,"Pune, Maharashtra",Rice,2026-10-21,82,6.7,25,84,12.0
+F003,Riverbend Farm,"Pune, Maharashtra",Rice,2026-10-22,68,6.9,27,76,3.0
+F004,Black Soil Farm,"Beed, Maharashtra",Maize,2026-10-20,18,7.1,34,55,0.0
+F004,Black Soil Farm,"Beed, Maharashtra",Maize,2026-10-21,24,7.0,32,57,0.0
+F004,Black Soil Farm,"Beed, Maharashtra",Maize,2026-10-22,39,6.9,29,63,1.0

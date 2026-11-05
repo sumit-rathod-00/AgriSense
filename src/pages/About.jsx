@@ -20,7 +20,8 @@ export default function About() {
             <li>React 19 UI compiled by Vite, styled with Tailwind CSS.</li>
             <li>Client-side routing with React Router.</li>
             <li>Charts with Recharts; icons with Lucide.</li>
-            <li>Persistent demonstration data in <code>localStorage</code> under key <code>agrisense.v1</code>.</li>
+            <li>Persistent farms, readings, and uploaded datasets in <code>localStorage</code> under key <code>agrisense.v1</code>.</li>
+            <li>CSV and Excel parsing, statistics, batch recommendations, and PDF reports all run in the browser.</li>
             <li>No backend, no IoT devices, and no paid cloud services at runtime.</li>
             <li>Static hosting ready for GitHub and Vercel (SPA rewrite to <code>index.html</code>).</li>
           </ul>
@@ -45,8 +46,9 @@ export default function About() {
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-amber-950">
           <li>Recommendations are not scientifically validated agricultural advice.</li>
           <li>The application does not use a trained machine learning model.</li>
-          <li>No physical sensors are connected; all values are typed or sampled.</li>
-          <li>Clearing browser storage removes the demonstration dataset.</li>
+          <li>No physical sensors, IoT devices, or live weather feeds are connected.</li>
+          <li>Uploaded measurements are not replaced with sample values. The bundled sample file is synthetic test data.</li>
+          <li>Clearing browser storage removes manual records and uploaded datasets saved on this computer.</li>
         </ul>
       </section>
     </div>

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { LoaderCircle, Sparkles } from 'lucide-react'
 import EmptyState from '../components/EmptyState'
+import RecommendationTable from '../components/RecommendationTable'
 import { useApp } from '../context/AppContext'
 import {
   CROP_TYPES,
@@ -24,8 +25,16 @@ const URGENCY_STYLES = {
 }
 
 export default function Recommendations() {
-  const { farms, recommendations, addRecommendation, deleteRecommendation, loadDemoData, showToast } =
-    useApp()
+  const {
+    farms,
+    recommendations,
+    addRecommendation,
+    deleteRecommendation,
+    loadDemoData,
+    showToast,
+    activeDataset,
+    datasetReport,
+  } = useApp()
   const [form, setForm] = useState(emptyForm)
   const [errors, setErrors] = useState({})
   const [latest, setLatest] = useState(null)
@@ -248,7 +257,31 @@ export default function Recommendations() {
       ) : null}
 
       <section className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm">
-        <h2 className="text-base font-semibold text-slate-900">Previous readings and recommendations</h2>
+        <h2 className="text-base font-semibold text-slate-900">Dataset batch recommendations</h2>
+        <p className="mt-1 text-sm text-slate-500">
+          Every eligible row in the active dataset is scored with the same rule engine as the form above. Thresholds
+          are illustrative and are not scientifically validated.
+        </p>
+        {!activeDataset || !datasetReport ? (
+          <p className="mt-4 text-sm text-slate-500">
+            Upload a dataset on Data Analysis to run the rules on every row that has moisture, pH, and temperature.
+          </p>
+        ) : (
+          <div className="mt-4">
+            {activeDataset.isSynthetic ? (
+              <p className="mb-3 rounded-xl bg-amber-50 px-3 py-2 text-sm font-medium text-amber-950">
+                SYNTHETIC TEST DATA from {activeDataset.fileName}.
+              </p>
+            ) : (
+              <p className="mb-3 text-sm text-slate-600">Active file: {activeDataset.fileName}.</p>
+            )}
+            <RecommendationTable rows={datasetReport.recommendations} />
+          </div>
+        )}
+      </section>
+
+      <section className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm">
+        <h2 className="text-base font-semibold text-slate-900">Previous manual recommendations</h2>
         {recommendations.length === 0 ? (
           <div className="mt-4">
             <EmptyState
